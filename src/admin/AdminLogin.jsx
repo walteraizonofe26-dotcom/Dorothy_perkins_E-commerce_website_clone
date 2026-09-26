@@ -1,14 +1,34 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom"
 
 function AdminLogin() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        // Auth logic added later
+        if (email == "" || password == "") {
+            alert("all fields required")
+        } else {
+            try {
+                const merchant_login = {
+                    email: email,
+                    password: password,
+                };
+
+                const resp = await axios.post("http://ecommerce.reworkstaging.name.ng/v2/merchants/login", merchant_login);
+                console.log(resp.data)
+                if (resp.data.id) {
+                    alert("login successful")
+                    navigate("/admin/dashboard")
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }
     };
 
     return (
