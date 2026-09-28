@@ -1,12 +1,16 @@
- function ProductAdminCard({ product, onEdit, onDelete }) {
-  const { name, description, image, price, quantity, category, status } = product;
+function ProductAdminCard({ product, onEdit, onDelete }) {
+  const { title, name, description, images, price, quantity, category, status } = product;
+
+  const displayName = title || name;
+
+  const displayCategory = typeof category === "object" ? category?.name : category;
 
   return (
     <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
-      <img src={image} alt={name} className="h-40 w-full rounded-md object-cover" />
+      <img src={images?.[0]} alt={displayName} className="h-40 w-full rounded-md object-cover" />
 
       <div className="mt-3">
-        <p className="font-semibold">{name}</p>
+        <p className="font-semibold">{displayName}</p>
         {description && (
           <p className="mt-1 text-xs text-neutral-500">{description}</p>
         )}
@@ -14,7 +18,7 @@
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
           <span className="font-semibold">{price}</span>
           <span className="text-neutral-500">Qty: {quantity}</span>
-          <span className="text-neutral-500">{category}</span>
+          {displayCategory && <span className="text-neutral-500">{displayCategory}</span>}
         </div>
 
         {status && (

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
+import axios from "axios";
+
 
 function CreateCategory() {
   const [formData, setFormData] = useState({
@@ -8,13 +10,40 @@ function CreateCategory() {
     image: "",
   });
 
+  const merchantID = localStorage.getItem("merchant_id");
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // API logic added later
+  
+    if (formData.name.trim() === "" || formData.image.trim() === "") {
+      alert("fields are required to create category")
+    } else {
+      try {
+        const create_category = {
+          merchant_id: merchantID,
+          name: formData.name,
+          image: formData.image,
+        };
+
+        console.log("Merchant ID:", merchantID);
+        console.log("Category data:", create_category);
+        const resp = await axios.post("http://ecommerce.reworkstaging.name.ng/v2/categories", create_category);
+        console.log("API Response", resp.data)
+
+        if (resp.data) {
+          alert("category created successful")
+          localStorage.setItem("category_id", resp.data.id)
+        }
+      } catch (error) {
+        console.log(error)
+        console.log("Full error:", error);
+        console.log("Server response:", error.response?.data);
+        console.log("Status:", error.response?.status);
+      }
+    }
   };
 
   return (
@@ -43,8 +72,9 @@ function CreateCategory() {
             <div>
               <label className="text-sm font-medium">Category Image</label>
               <input
-                type="file"
+                type="url"
                 name="image"
+                 value={formData.image}
                 onChange={handleChange}
                 className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-sm outline-none"
               />

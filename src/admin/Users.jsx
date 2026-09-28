@@ -1,31 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import UserTable from "../components/admin/UserTable";
+import axios from "axios";
 
-const allUsers = [
-  { id: 1, name: "Sarah Johnson", email: "sarah.j@example.com", phone: "+44 7911 123456", status: "Active", dateJoined: "12 Jan 2026" },
-  { id: 2, name: "Emma Williams", email: "emma.w@example.com", phone: "+44 7911 234567", status: "Active", dateJoined: "03 Feb 2026" },
-  { id: 3, name: "Olivia Brown", email: "olivia.b@example.com", phone: "+44 7911 345678", status: "Inactive", dateJoined: "18 Feb 2026" },
-  { id: 4, name: "Ava Davis", email: "ava.d@example.com", phone: "+44 7911 456789", status: "Active", dateJoined: "25 Feb 2026" },
-  { id: 5, name: "Sophia Miller", email: "sophia.m@example.com", phone: "+44 7911 567890", status: "Active", dateJoined: "02 Mar 2026" },
-  { id: 6, name: "Isabella Wilson", email: "isabella.w@example.com", phone: "+44 7911 678901", status: "Inactive", dateJoined: "10 Mar 2026" },
-];
 
 function Users() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState([]);
 
-  const filteredUsers = allUsers.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const resp = await axios.get("http://ecommerce.reworkstaging.name.ng/v2/users");
+         console.log("API Response:", resp.data)
+        if(resp.data){
+          setUsers(resp.data)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchUser();
+  }, [])
+
+    const filteredUsers = users.filter((user) => {
+        const fullName =
+            `${user.first_name} ${user.last_name}`.toLowerCase();
+
+        return (
+            fullName.includes(searchTerm.toLowerCase()) ||
+            user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.phone?.includes(searchTerm)
+        );
+    });
 
   const handleEdit = (id) => {
-    // navigation to edit form added later
-  };
+   };
 
   const handleDelete = (id) => {
-    // delete logic added later
+
   };
 
   return (
@@ -36,6 +51,17 @@ function Users() {
         <AdminHeader title="Users" />
 
         <main className="p-6">
+
+           <div className="mb-6">
+                        <h1 className="text-2xl font-bold text-neutral-900">
+                            Users
+                        </h1>
+
+                        <p className="mt-1 text-sm text-neutral-500">
+                            Manage all customers registered on your website.
+                        </p>
+                    </div>
+
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <input
               type="text"

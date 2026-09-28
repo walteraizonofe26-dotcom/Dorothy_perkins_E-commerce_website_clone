@@ -18,7 +18,7 @@
             <tr key={product.id} className="border-b border-neutral-100 last:border-0">
               <td className="px-4 py-3">
                 <img
-                  src={product.image}
+                  src={product.images?.[0]}
                   alt={product.name}
                   className="h-12 w-12 rounded-md object-cover"
                 />

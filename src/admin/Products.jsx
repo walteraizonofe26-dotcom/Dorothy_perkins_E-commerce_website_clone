@@ -1,34 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import ProductAdminCard from "../components/admin/ProductAdminCard";
-
-const allProducts = [
-  { id: 1, name: "Berry Spot Midi Shirt Dress", description: "Lightweight woven midi dress", image: "/images/admin-product-1.jpg", price: "£39.00", quantity: 24, category: "Dresses", status: "Active" },
-  { id: 2, name: "Floral Keyhole Midi Dress", description: "Long sleeve keyhole neckline", image: "/images/admin-product-2.jpg", price: "£35.00", quantity: 12, category: "Dresses", status: "Active" },
-  { id: 3, name: "Blue Spot V Neck Midi Dress", description: "Polka dot print, V neckline", image: "/images/admin-product-3.jpg", price: "£31.20", quantity: 0, category: "Dresses", status: "Out of Stock" },
-  { id: 4, name: "Tailored Wide Leg Trouser", description: "High rise, wide leg fit", image: "/images/admin-product-4.jpg", price: "£27.20", quantity: 18, category: "Trousers", status: "Active" },
-  { id: 5, name: "Chunky Knit Jumper", description: "Oversized fit, ribbed cuffs", image: "/images/admin-product-5.jpg", price: "£26.00", quantity: 30, category: "Knitwear", status: "Active" },
-  { id: 6, name: "Cropped Denim Jacket", description: "Classic wash, button front", image: "/images/admin-product-6.jpg", price: "£30.00", quantity: 9, category: "Coats & Jackets", status: "Active" },
-  { id: 7, name: "Satin Cami Slip Dress", description: "Adjustable straps, bias cut", image: "/images/admin-product-7.jpg", price: "£24.00", quantity: 0, category: "Dresses", status: "Out of Stock" },
-  { id: 8, name: "Puff Sleeve Blouse", description: "Round neck, puff sleeve detail", image: "/images/admin-product-8.jpg", price: "£20.00", quantity: 15, category: "Tops", status: "Active" },
-];
+import axios from "axios"
 
 function Products() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProduct] = useState([])
 
-  const filteredProducts = allProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const merchantID = localStorage.getItem("merchant_id");
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const resp = await axios.get(`http://ecommerce.reworkstaging.name.ng/v2/products?merchant_id=${merchantID}`);
+        console.log("API Response:", resp.data.data)
+        if (resp.data.data) {
+          setProduct(resp.data.data);
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchProducts();
+  }, [])
+
+  const filteredProducts = products.filter((product) => {
+    const fullProduct =
+      `${product.title} ${product.brand}`.toLowerCase();
+
+    return (
+      fullProduct.includes(searchTerm.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.price?.includes(searchTerm)
+    );
+  });
 
   const handleEdit = (id) => {
-    // navigation to edit form added later
   };
 
   const handleDelete = (id) => {
-    // delete logic added later
-  };
+    };
 
   return (
     <div className="flex min-h-screen bg-neutral-50">
@@ -57,6 +69,7 @@ function Products() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filteredProducts.map((product) => (
+
               <ProductAdminCard
                 key={product.id}
                 product={product}

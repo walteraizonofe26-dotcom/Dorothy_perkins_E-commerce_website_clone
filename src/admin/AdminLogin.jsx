@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { data, Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"
 
@@ -20,13 +20,17 @@ function AdminLogin() {
                 };
 
                 const resp = await axios.post("http://ecommerce.reworkstaging.name.ng/v2/merchants/login", merchant_login);
-                console.log(resp.data)
+                console.log("Login resp:", resp.data)
                 if (resp.data.id) {
                     alert("login successful")
+                    localStorage.setItem("merchant_id", resp.data.id)
+                    console.log("Merchant ID:", resp.data.id)
                     navigate("/admin/dashboard")
                 }
             } catch (error) {
-                console.log(error)
+                console.log("Full error:", error);
+                console.log("Server response:", error.response?.data);
+                console.log("Status:", error.response?.status);
             }
         }
     };
