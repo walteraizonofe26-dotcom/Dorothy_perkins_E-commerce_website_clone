@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/logo1.jpg"
 import userIcon from "../assets/login_person.png";
 import bagIcon from "../assets/cart-image.png";
+import { useCart } from "../context/CartContext";
 
 const navItems = [
     { name: "Sale", path: "/sale" },
@@ -16,6 +17,8 @@ const navItems = [
 ];
 
 function Navbar() {
+    const { cart } = useCart();
+
     return (
         <header className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-8">
@@ -32,7 +35,7 @@ function Navbar() {
                         placeholder="Search Products and Brands"
                         className="w-full rounded-full bg-[#f5f5f5] py-2.5 pl-4 pr-20 text-sm text-neutral-700 outline-none placeholder:text-neutral-500"
                     />
-                    <div className="absolute right-4 top-1/2 flex -translate-y-1/2 gap-3">
+                    {/* <div className="absolute right-4 top-1/2 flex -translate-y-1/2 gap-3">
                         <img
                             src={bagIcon}
                             alt="Search by image"
@@ -43,7 +46,7 @@ function Navbar() {
                             alt="Search"
                             className="h-5 w-5 cursor-pointer"
                         />
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Right-side icons */}
@@ -55,16 +58,21 @@ function Navbar() {
                             className="h-5 w-5 cursor-pointer"
                         />
                     </Link>
-                    <img
+                    {/* <img
                         src={bagIcon}
                         alt="Wishlist"
                         className="h-5 w-5 cursor-pointer"
-                    />
-                    <img
-                        src={bagIcon}
-                        alt="Shopping bag"
-                        className="h-5 w-5 cursor-pointer"
-                    />
+                    /> */}
+
+                    <Link to="/cart" className="relative">
+                        <img src={bagIcon} alt="Shopping bag" className="h-5 w-5 cursor-pointer" />
+                        {cart.length > 0 && (
+                            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white">
+                                {cart.length}
+                            </span>
+                        )}
+                    </Link>
+
                 </div>
             </div>
 
@@ -98,7 +106,7 @@ function Navbar() {
                     &gt;
                 </button>
             </div>
-        </header>
+        </header >
 
     );
 }

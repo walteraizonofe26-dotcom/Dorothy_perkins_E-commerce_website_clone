@@ -35,7 +35,7 @@ function ProductAdminCard({ product, onEdit, onDelete }) {
 
         <div className="mt-3 flex gap-2">
           <button
-            onClick={() => onEdit && onEdit(product.id)}
+            onClick={() => onEdit && onEdit(product)}
             className="flex-1 rounded-md border border-neutral-300 py-1.5 text-xs font-medium hover:bg-neutral-50"
           >
             Edit

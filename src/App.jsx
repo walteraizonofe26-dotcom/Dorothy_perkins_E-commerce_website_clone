@@ -21,7 +21,9 @@ import CreateUser from "./admin/CreateUser";
 import Categories from "./admin/Categories";
 import CreateCategory from "./admin/CreateCategory";
 import AdminRegister from "./admin/AdminRegister";
-
+import ProductPage from "./pages/ProductPage";
+import CartPage from "./pages/CartPage";
+import CreateAccount from "./pages/CreateAccount";
 
 
 function App() {
@@ -49,6 +51,9 @@ function App() {
         <Route path="/admin/categories" element={<Categories />} />
         <Route path="/admin/categories/create" element={<CreateCategory />} />
         <Route path="/admin/register" element={<AdminRegister />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/register" element={<CreateAccount />} />
       </Routes>
     </BrowserRouter>
 

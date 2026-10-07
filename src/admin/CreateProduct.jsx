@@ -43,7 +43,6 @@ function CreateProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (
       formData.name.trim() === "" ||
       formData.description.trim() === "" ||

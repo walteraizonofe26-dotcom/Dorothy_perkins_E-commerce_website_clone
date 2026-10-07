@@ -1,26 +1,9 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
+import { Link } from "react-router-dom"
 const heroImages = ["dp_images/hero1.png", "dp_images/hero2.png", "dp_images/hero3.png"];
-
-const products = [
-  { id: 1, name: "Petite Berry Ditsy Frill Neck Midi Dress", price: "£38.00", oldPrice: null, img: "dp_images/product1.jpg", colors: ["🔴", "⚫", "🟢"] },
-  { id: 2, name: "Petite Black Ruched Sleeve Blazer", price: "£34.30", oldPrice: "£49.00", img: "dp_images/product2.jpg", colors: ["⚫", "🟤"] },
-  { id: 3, name: "3/4 Roll Sleeve Blouse", price: "£25.00", oldPrice: null, img: "dp_images/product3.jpg", colors: ["🔴", "⚫", "🟢"] },
-  { id: 4, name: "Petite Ankle Grazer Trouser", price: "£28.80", oldPrice: "£32.00", img: "dp_images/product4.jpg", colors: ["🟤", "🟣"] },
-  { id: 5, name: "Ankle Grazer Trouser", price: "£25.60", oldPrice: "£32.00", img: "dp_images/product5.jpg", colors: ["🟤", "🟣"] },
-  { id: 6, name: "Wrap Midi Dress", price: "£30.00", oldPrice: null, img: "dp_images/product6.jpg", colors: ["🔴", "🟢"] },
-  { id: 7, name: "Tailored Wide Leg Trouser", price: "£27.20", oldPrice: "£34.00", img: "dp_images/product7.jpg", colors: ["⚫", "🟤"] },
-  { id: 8, name: "Puff Sleeve Blouse", price: "£22.00", oldPrice: "£28.00", img: "dp_images/product8.jpg", colors: ["🔴", "⚪"] },
-  { id: 9, name: "Belted Shirt Dress", price: "£36.00", oldPrice: null, img: "dp_images/product9.jpg", colors: ["🟢", "🟤"] },
-  { id: 10, name: "Straight Leg Denim Jean", price: "£54.30", oldPrice: "£30.00", img: "dp_images/product10.jpg", colors: ["🔵", "⚫"] },
-  { id: 11, name: "Straight Leg Denim Jean", price: "£24.30", oldPrice: "£50.00", img: "dp_images/product11.jpg", colors: ["🔵", "⚫"] },
-  { id: 12, name: "Straight Leg Denim Jean", price: "£94.30", oldPrice: "£90.00", img: "dp_images/product12.jpg", colors: ["🔵", "⚫"] },
-  { id: 13, name: "Straight Leg Denim Jean", price: "£24.30", oldPrice: "£37.00", img: "dp_images/product13.jpg", colors: ["🔵", "⚫"] },
-  { id: 14, name: "Straight Leg Denim Jean", price: "£14.30", oldPrice: "£20.00", img: "dp_images/product14.jpg", colors: ["🔵", "⚫"] },
-  { id: 15, name: "Straight Leg Denim Jean", price: "£44.30", oldPrice: "£30.00", img: "dp_images/product15.jpg", colors: ["🔵", "⚫"] },
-];
 
 function Dp() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,12 +23,44 @@ function Dp() {
     setCurrentIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
   };
 
+  // ---------- PRODUCTS FROM API ----------
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const merchantID = localStorage.getItem("merchant_id");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const resp = await axios.get(
+          `http://ecommerce.reworkstaging.name.ng/v2/products?merchant_id=${merchantID}`
+        );
+        if (resp.data.data) {
+          setProducts(resp.data.data);
+        }
+      } catch (err) {
+        console.log(err);
+        setError("Could not load products. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [merchantID]);
+
+
+  // const handleAddToCart = (product) => {
+  //   // Cart logic added later
+  // };
+
   // Product carousel — manual sliding only, no auto-timer
   const visibleCount = 5;
   const [startIndex, setStartIndex] = useState(0);
 
   const goToNextProducts = () => {
-    setStartIndex((prev) => Math.min(prev + 1, products.length - visibleCount));
+    setStartIndex((prev) => Math.min(prev + 1, Math.max(products.length - visibleCount, 0)));
   };
 
   const goToPrevProducts = () => {
@@ -130,7 +145,6 @@ function Dp() {
         ))}
       </div>
 
-    
       <div className="grid grid-cols-2 gap-3 px-3 md:grid-cols-4 md:gap-4 md:px-6">
         {["dp_images/trending2.jpg", "dp_images/trending1.jpg", "dp_images/trending4.jpg", "dp_images/trending3.jpg"].map((src, index) => (
           <img
@@ -164,6 +178,7 @@ function Dp() {
         ))}
       </div>
 
+      {/* ---------- WARDROBES, UPDATES (now from API) ---------- */}
       <div className="px-6 py-8">
         <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <div>
@@ -178,70 +193,67 @@ function Dp() {
           </div>
         </div>
 
-        <div className="relative">
-          <div className="overflow-hidden">
-            <div
-              className="flex gap-4 transition-transform duration-300 ease-out"
-              style={{
-                transform: `translateX(-${startIndex * (100 / visibleCount)}%)`,
-              }}
-            >
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="w-1/2 shrink-0 sm:w-1/3 md:w-1/5"
-                >
-                  <img
-                    src={product.img}
-                    alt={product.name}
-                    className="h-72 w-full object-cover"
-                  />
-                  <p className="mt-2 text-xs font-semibold text-neutral-500">
-                    Dorothy Perkins
-                  </p>
-                  <p className="text-sm text-neutral-800">{product.name}</p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span
-                      className={`text-sm font-semibold ${product.oldPrice ? "text-red-600" : "text-black"
-                        }`}
-                    >
-                      {product.price}
-                    </span>
-                    {product.oldPrice && (
-                      <span className="text-sm text-neutral-400 line-through">
-                        {product.oldPrice}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-2 flex gap-1 text-lg">
-                    {product.colors.map((color, i) => (
-                      <span key={i} className="cursor-pointer">
-                        {color}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {isLoading && <p className="text-sm text-neutral-500">Loading products...</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <button
-            onClick={goToPrevProducts}
-            aria-label="Previous products"
-            disabled={startIndex === 0}
-            className="absolute left-0 top-1/3 flex h-9 w-9 -translate-x-4 -translate-y-1/2 items-center justify-center rounded-full bg-white text-lg shadow disabled:opacity-30"
-          >
-            &lt;
-          </button>
-          <button
-            onClick={goToNextProducts}
-            aria-label="Next products"
-            disabled={startIndex >= products.length - visibleCount}
-            className="absolute right-0 top-1/3 flex h-9 w-9 -translate-y-1/2 translate-x-4 items-center justify-center rounded-full bg-white text-lg shadow disabled:opacity-30"
-          >
-            &gt;
-          </button>
-        </div>
+        {!isLoading && !error && (
+          <div className="relative">
+            <div className="overflow-hidden">
+              <div
+                className="flex gap-4 transition-transform duration-300 ease-out"
+                style={{
+                  transform: `translateX(-${startIndex * (100 / visibleCount)}%)`,
+                }}
+              >
+                {products.map((product) => (
+                  <div key={product.id} className="w-1/2 shrink-0 sm:w-1/3 md:w-1/5">
+                    <img
+                      src={product.images?.[0]}
+                      alt={product.title}
+                      className="h-72 w-full object-cover"
+                    />
+                    <p className="mt-2 text-sm text-neutral-800">{product.title}</p>
+                    {product.descp && (
+                      <p className="text-xs text-neutral-500">{product.descp}</p>
+                    )}
+                    <p className="mt-1 text-sm font-semibold">
+                      {product.currency} {product.price}
+                    </p>
+
+
+                    <Link to={`/product/${product.id}`} className="block w-full bg-gray-200 text-center p-2 rounded-sm">
+                      VIEW PRODUCT
+                    </Link>
+
+                    {/* <button
+                      onClick={() => handleAddToCart(product)}
+                      className="mt-3 w-full bg-black py-2 text-xs font-semibold text-white hover:bg-neutral-800"
+                    >
+                    </button> */}
+
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={goToPrevProducts}
+              aria-label="Previous products"
+              disabled={startIndex === 0}
+              className="absolute left-0 top-1/3 flex h-9 w-9 -translate-x-4 -translate-y-1/2 items-center justify-center rounded-full bg-white text-lg shadow disabled:opacity-30"
+            >
+              &lt;
+            </button>
+            <button
+              onClick={goToNextProducts}
+              aria-label="Next products"
+              disabled={startIndex >= products.length - visibleCount}
+              className="absolute right-0 top-1/3 flex h-9 w-9 -translate-y-1/2 translate-x-4 items-center justify-center rounded-full bg-white text-lg shadow disabled:opacity-30"
+            >
+              &gt;
+            </button>
+          </div>
+        )}
       </div>
 
       <img
@@ -250,7 +262,6 @@ function Dp() {
         className="w-full object-cover"
       />
 
-      {/* ---------- GODDIVA HERO BANNER ---------- */}
       <section className="relative h-[400px] w-full overflow-hidden md:h-[550px]">
         <img
           src="dp_images/gloddiva2.jpg"
@@ -262,20 +273,11 @@ function Dp() {
         </button>
       </section>
 
-      <img
-        src="dp_images/roman.jpg"
-        alt="Featured brands"
-        className="w-full object-cover"
-      />
+      <img src="dp_images/roman.jpg" alt="Featured brands" className="w-full object-cover" />
       <div className="grid grid-cols-2 gap-3 px-3 md:grid-cols-4 md:gap-4 md:px-6">
         {["dp_images/gridImage1.jpg", "dp_images/gridImage2.jpg", "dp_images/gridImage3.jpg", "dp_images/gridImage4.jpg"].map(
           (src, index) => (
-            <img
-              key={index}
-              src={src}
-              alt={`Brand ${index + 1}`}
-              className="h-64 w-full object-cover md:h-80"
-            />
+            <img key={index} src={src} alt={`Brand ${index + 1}`} className="h-64 w-full object-cover md:h-80" />
           )
         )}
       </div>
@@ -286,9 +288,8 @@ function Dp() {
         className="w-full object-cover"
       />
 
-      {/* ---------- WELCOME TEXT (real text, expandable) ---------- */}
       <WelcomeText />
-       <Footer />
+      <Footer />
     </div>
   );
 }
@@ -299,8 +300,10 @@ function WelcomeText() {
   const shortText =
     "Welcome to DP, where effortless, everyday pieces combine for a curated wardrobe you'll love. Explore our latest collections and discover hard-working, elevated feminine designs for busy moments and non-stop schedules. Signature";
 
-  const fullText = shortText + " tailoring, versatile denim, and statement dresses sit alongside wardrobe staples designed to move with you — from the office to evenings out. Whatever the occasion, DP makes it easy to look and feel your best.";
-  
+  const fullText =
+    shortText +
+    " tailoring, versatile denim, and statement dresses sit alongside wardrobe staples designed to move with you — from the office to evenings out. Whatever the occasion, DP makes it easy to look and feel your best.";
+
   return (
     <div className="px-6 py-10 text-center">
       <p className="mx-auto max-w-4xl text-sm text-neutral-600">

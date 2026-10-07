@@ -214,10 +214,9 @@ export default function Footer() {
         </div>
     </div>
 
-    {/* ---------- COPYRIGHT ---------- */ }
     <div className="border-t border-neutral-200 py-6 text-center">
         <p className="text-lg font-black">DP.</p>
-        <p className="text-xs text-neutral-500">COPYRIGHT © 2026 DOROTHY PERKINS</p>
+        <p className="text-xs text-neutral-500">CLONE © 2026 DOROTHY PERKINS</p>
     </div>
     </footer >
   );

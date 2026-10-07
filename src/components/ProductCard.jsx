@@ -1,83 +1,30 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function ProductCard({ product }) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
-
-  const {
-    brand,
-    name,
-    description,
-    image,
-    price,
-    oldPrice,
-    discount,
-    rating,
-    reviews,
-    colors,
-  } = product;
+  const { id, title, images, descp, price, currency } = product;
 
   return (
-    <div className="relative">
-      {/* Wishlist button */}
-      <button
-        onClick={() => setIsWishlisted((prev) => !prev)}
-        aria-label="Add to wishlist"
-        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-lg shadow"
-      >
-        {isWishlisted ? "❤️" : "🤍"}
-      </button>
-
-      <img src={image} alt={name} className="h-72 w-full object-cover" />
+    <div>
+      <img src={images?.[0]} alt={title} className="h-72 w-full object-cover" />
 
       <div className="mt-2">
-        {brand && <p className="text-xs font-semibold text-neutral-500">{brand}</p>}
+        <p className="text-sm text-neutral-800">{title}</p>
 
-        <p className="text-sm text-neutral-800">{name}</p>
+        {descp && <p className="text-xs text-neutral-500">{descp}</p>}
 
-        {description && (
-          <p className="text-xs text-neutral-500">{description}</p>
-        )}
+        <p className="mt-1 text-sm font-semibold">
+          {currency} {price}
+        </p>
 
-        {/* Price row — oldPrice/discount only render if they exist */}
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          <span
-            className={`text-sm font-semibold ${
-              oldPrice ? "text-red-600" : "text-black"
-            }`}
-          >
-            {price}
-          </span>
-          {oldPrice && (
-            <span className="text-sm text-neutral-400 line-through">{oldPrice}</span>
-          )}
-          {discount && (
-            <span className="text-xs font-semibold text-red-600">{discount}</span>
-          )}
-        </div>
-
-        {/* Rating — only if provided */}
-        {rating && (
-          <div className="mt-1 flex items-center gap-1 text-xs text-neutral-600">
-            <span>{"★".repeat(rating)}{"☆".repeat(5 - rating)}</span>
-            {reviews && <span>({reviews})</span>}
-          </div>
-        )}
-
-        {/* Color swatches — only if provided */}
-        {colors && colors.length > 0 && (
-          <div className="mt-2 flex gap-1.5">
-            {colors.map((color, index) => (
-              <span
-                key={index}
-                className="h-4 w-4 cursor-pointer rounded-full border border-neutral-300"
-                style={{ backgroundColor: color }}
-              />
-            ))}
-          </div>
-        )}
+        <Link
+          to={`/product/${id}`}
+          className="mt-3 block w-full bg-gray-200 py-2 text-center text-xs font-semibold hover:bg-gray-300"
+        >
+          VIEW MORE
+        </Link>
       </div>
     </div>
   );
 }
 
-export default ProductCard
+export default ProductCard;

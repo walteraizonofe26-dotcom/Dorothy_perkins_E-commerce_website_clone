@@ -1,46 +1,67 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import ProductAdminCard from "../components/admin/ProductAdminCard";
-import axios from "axios"
+import EditProductModal from "../components/admin/EditProductModal";
 
 function Products() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [products, setProduct] = useState([])
+  const [products, setProducts] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   const merchantID = localStorage.getItem("merchant_id");
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const resp = await axios.get(`http://ecommerce.reworkstaging.name.ng/v2/products?merchant_id=${merchantID}`);
-        console.log("API Response:", resp.data.data)
-        if (resp.data.data) {
-          setProduct(resp.data.data);
-        }
-      } catch (error) {
-        console.log(error)
+
+  const fetchProducts = async () => {
+    try {
+      const resp = await axios.get(
+        `http://ecommerce.reworkstaging.name.ng/v2/products?merchant_id=${merchantID}`
+      );
+      if (resp.data.data) {
+        setProducts(resp.data.data);
       }
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  useEffect(() => {
     fetchProducts();
-  }, [])
+  }, []);
 
   const filteredProducts = products.filter((product) => {
-    const fullProduct =
-      `${product.title} ${product.brand}`.toLowerCase();
+    const fullProduct = `${product.title} ${product.brand}`.toLowerCase();
 
     return (
       fullProduct.includes(searchTerm.toLowerCase()) ||
-      product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.price?.includes(searchTerm)
+      product.descp?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(product.price)?.includes(searchTerm)
     );
   });
 
-  const handleEdit = (id) => {
+  // Passes the whole product (not just the id) so the modal can pre-fill its fields
+  const handleEdit = (product) => {
+    setEditingProduct(product);
   };
 
-  const handleDelete = (id) => {
-    };
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this product?");
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(`http://ecommerce.reworkstaging.name.ng/v2/products/${id}`);
+      fetchProducts();
+    } catch (error) {
+      console.log(error);
+      alert("Could not delete product. Please try again.");
+    }
+  };
+
+  const handleUpdated = () => {
+    setEditingProduct(null);
+    fetchProducts();
+  };
 
   return (
     <div className="flex min-h-screen bg-neutral-50">
@@ -69,7 +90,6 @@ function Products() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filteredProducts.map((product) => (
-
               <ProductAdminCard
                 key={product.id}
                 product={product}
@@ -80,6 +100,14 @@ function Products() {
           </div>
         </main>
       </div>
+
+      {editingProduct && (
+        <EditProductModal
+          product={editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onUpdated={handleUpdated}
+        />
+      )}
     </div>
   );
 }

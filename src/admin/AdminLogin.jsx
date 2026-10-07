@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { data, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"
 
@@ -12,6 +12,7 @@ function AdminLogin() {
         e.preventDefault();
         if (email == "" || password == "") {
             alert("all fields required")
+            
         } else {
             try {
                 const merchant_login = {
